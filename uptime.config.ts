@@ -37,7 +37,7 @@ const workerConfig: WorkerConfig = {
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
     // ── 2/8 ────────────────────────────────────────────────
-    { id: 'bot_cn', name: '机器人后台', method: 'GET',
+    { id: 'bot_cn', name: '机器人主页', method: 'GET',
       target: 'http://bot.bilibili-wrbq.cn',
       statusPageLink: 'http://bot.bilibili-wrbq.cn',
       tooltip: 'bot.bilibili-wrbq.cn',
