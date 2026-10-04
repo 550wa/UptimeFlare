@@ -102,10 +102,12 @@ const workerConfig: WorkerConfig = {
     // 而 mc.bilibili-wrbq.cn 本身没有 A 记录（没有真实 IP），
     // 所以这里必须填 SRV 指向的真实地址：frp-sun.com:21433
     // ⚠️ 千万别改成 mc.bilibili-wrbq.cn:25565，那样会一直报宕机。
+    // 默认检测节点在伦敦，而 frp 服务商屏蔽了海外机房 IP，所以指定用亚太节点检测
     { id: 'mc_server', name: 'Minecraft 服务器', method: 'TCP_PING',
       target: 'frp-sun.com:21433',
       tooltip: 'mc.bilibili-wrbq.cn（SRV 转发至 frp-sun.com:21433）',
-      timeout: 8000 },
+      checkProxy: 'worker://apac',
+      timeout: 10000 },
 
     // ↓↓↓ 下面是注释掉的写法示例，不生效，留着方便你以后照着加 ↓↓↓
 
