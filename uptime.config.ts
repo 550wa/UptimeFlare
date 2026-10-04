@@ -16,7 +16,7 @@ const pageConfig: PageConfig = {
   // 状态页分组显示
   group: {
     'bilibili-wrbq.cn': ['www_cn', 'bot_cn', 'botdocs_cn', 'download_cn', 'miao_cn', 'wrbqos_cn'],
-    'bilibili-wrbq.top': ['www_top', 'api_top'],
+    'bilibili-wrbq.top': ['www_top'],
   },
 }
 
