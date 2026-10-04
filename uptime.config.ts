@@ -73,16 +73,31 @@ const workerConfig: WorkerConfig = {
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
     // ── 8/8 ────────────────────────────────────────────────
-    { id: 'api_top', name: 'API 接口', method: 'GET',
-      target: 'http://api.bilibili-wrbq.top',
+    // NewAPI 网关：监控 /api/status 健康接口，并校验返回内容里的 "success":true
+    // 注意：不要监控根路径 —— NewAPI 的根路径是前端静态页，
+    // 后端服务或数据库挂了它照样返回 200，测不出真实故障。
+    { id: 'api_top', name: 'API 接口（NewAPI）', method: 'GET',
+      target: 'http://api.bilibili-wrbq.top/api/status',
       statusPageLink: 'http://api.bilibili-wrbq.top',
-      tooltip: 'api.bilibili-wrbq.top',
-      expectedCodes: [200, 301, 302], timeout: 10000 },
+      tooltip: 'NewAPI 健康检查接口',
+      expectedCodes: [200],
+      responseKeyword: '"success":true',
+      timeout: 15000 },
 
-    // ↓↓↓ 下面两条是注释掉的写法示例，不生效 ↓↓↓
+    // ↓↓↓ 下面是注释掉的示例，不生效 ↓↓↓
+
+    // 【Minecraft 服务器】把地址改成你的，然后删掉每行开头的 “//” 即可生效
+    // { id: 'mc_server', name: 'Minecraft 服务器', method: 'TCP_PING',
+    //   target: '你的服务器IP:25565',
+    //   tooltip: 'Java 版默认端口 25565，非默认端口就改这里的数字',
+    //   timeout: 5000 },
+
+    // 【其他端口】比如 SSH、数据库
+    // { id: 'my_server_ssh', name: '服务器 SSH', method: 'TCP_PING', target: '1.2.3.4:22', timeout: 5000 },
+
+    // 【普通网站】再加一个新的网页监控
     // { id: 'new_monitor', name: '新站点', method: 'GET', target: 'https://要监控的地址',
     //   expectedCodes: [200, 301, 302], timeout: 10000 },
-    // { id: 'my_server_ssh', name: '服务器 SSH', method: 'TCP_PING', target: '1.2.3.4:22', timeout: 5000 },
   ],
 
   // 告警通知：暂时关闭（只记录，不推消息）。
