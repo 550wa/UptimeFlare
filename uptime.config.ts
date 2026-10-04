@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-//  UptimeFlare 配置 ｜ 共 9 个监控
+//  UptimeFlare 配置 ｜ 共 8 个监控（另有 1 个 MC 服务器监控已备好，见文末注释）
 //
 //  怎么用：整段复制 → 覆盖 GitHub 仓库根目录的 uptime.config.ts
 //          → Commit changes → 去 Actions 页面等绿勾（1~3 分钟）
@@ -17,7 +17,8 @@ const pageConfig: PageConfig = {
   group: {
     'bilibili-wrbq.cn': ['www_cn', 'bot_cn', 'botdocs_cn', 'download_cn', 'miao_cn', 'wrbqos_cn'],
     'bilibili-wrbq.top': ['www_top', 'api_top'],
-    'Minecraft 服务器': ['mc_server'],
+    // MC 服务器分组：配置已备好（见下方 9/9），等找到可用方案再一起启用
+    // 'Minecraft 服务器': ['mc_server'],
   },
 }
 
@@ -102,12 +103,19 @@ const workerConfig: WorkerConfig = {
     // 而 mc.bilibili-wrbq.cn 本身没有 A 记录（没有真实 IP），
     // 所以这里必须填 SRV 指向的真实地址：frp-sun.com:21433
     // ⚠️ 千万别改成 mc.bilibili-wrbq.cn:25565，那样会一直报宕机。
-    // 默认检测节点在伦敦，而 frp 服务商屏蔽了海外机房 IP，所以指定用亚太节点检测
-    { id: 'mc_server', name: 'Minecraft 服务器', method: 'TCP_PING',
-      target: 'frp-sun.com:21433',
-      tooltip: 'mc.bilibili-wrbq.cn（SRV 转发至 frp-sun.com:21433）',
-      checkProxy: 'worker://apac',
-      timeout: 10000 },
+    // 【暂时停用 —— 等找到可用方案再启用】
+    // 现状：你的 MC 服务器本身完全正常（实测能拿到 1.21.11 / 创造服 / 0-20 人在线），
+    //      但 frp 服务商（frp-sun.com）屏蔽了海外机房 IP，
+    //      而 Cloudflare Workers 用的正是机房 IP，所以从 Cloudflare 连不上 21433 端口。
+    //      实测：台北住宅宽带能通；东京、首尔、洛杉矶、伦敦、阿姆斯特丹、香港的机房全部 100% 丢包。
+    // 启用条件（满足其一即可，启用时把下面这块的 // 去掉，并把上面分组的注释一起去掉）：
+    //   ① 换一个不屏蔽海外机房的 frp 服务商 / 节点；
+    //   ② 在 MC 服务器上跑一个 HTTP 状态页，用 Cloudflare Tunnel 暴露后改用 GET 方式监控。
+    // ⚠️ 注意：target 必须填 SRV 指向的真实地址，不能写 mc.bilibili-wrbq.cn（它没有 A 记录）。
+    // { id: 'mc_server', name: 'Minecraft 服务器', method: 'TCP_PING',
+    //   target: 'frp-sun.com:21433',
+    //   tooltip: 'mc.bilibili-wrbq.cn（SRV 转发至 frp-sun.com:21433）',
+    //   timeout: 10000 },
 
     // ↓↓↓ 下面是注释掉的写法示例，不生效，留着方便你以后照着加 ↓↓↓
 
