@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════════════
-//  UptimeFlare 配置 ｜ 共 8 个监控（另有 1 个 MC 服务器监控已备好，见文末注释）
+//  UptimeFlare 配置 ｜ 共 8 个网站监控
 //
 //  怎么用：整段复制 → 覆盖 GitHub 仓库根目录的 uptime.config.ts
 //          → Commit changes → 去 Actions 页面等绿勾（1~3 分钟）
@@ -17,8 +17,6 @@ const pageConfig: PageConfig = {
   group: {
     'bilibili-wrbq.cn': ['www_cn', 'bot_cn', 'botdocs_cn', 'download_cn', 'miao_cn', 'wrbqos_cn'],
     'bilibili-wrbq.top': ['www_top', 'api_top'],
-    // MC 服务器分组：配置已备好（见下方 9/9），等找到可用方案再一起启用
-    // 'Minecraft 服务器': ['mc_server'],
   },
 }
 
@@ -31,56 +29,56 @@ const workerConfig: WorkerConfig = {
   kvWriteCooldownMinutes: 1,
 
   monitors: [
-    // ── 1/9 ────────────────────────────────────────────────
+    // ── 1/8 ────────────────────────────────────────────────
     { id: 'www_cn', name: '主站', method: 'GET',
       target: 'http://www.bilibili-wrbq.cn',
       statusPageLink: 'http://www.bilibili-wrbq.cn',
       tooltip: 'www.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 2/9 ────────────────────────────────────────────────
+    // ── 2/8 ────────────────────────────────────────────────
     { id: 'bot_cn', name: '机器人后台', method: 'GET',
       target: 'http://bot.bilibili-wrbq.cn',
       statusPageLink: 'http://bot.bilibili-wrbq.cn',
       tooltip: 'bot.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 3/9 ────────────────────────────────────────────────
+    // ── 3/8 ────────────────────────────────────────────────
     { id: 'botdocs_cn', name: '机器人文档', method: 'GET',
       target: 'http://botdocs.bilibili-wrbq.cn',
       statusPageLink: 'http://botdocs.bilibili-wrbq.cn',
       tooltip: 'botdocs.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 4/9 ────────────────────────────────────────────────
+    // ── 4/8 ────────────────────────────────────────────────
     { id: 'download_cn', name: '软件下载站', method: 'GET',
       target: 'http://download.bilibili-wrbq.cn',
       statusPageLink: 'http://download.bilibili-wrbq.cn',
       tooltip: 'download.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 5/9 ────────────────────────────────────────────────
+    // ── 5/8 ────────────────────────────────────────────────
     { id: 'miao_cn', name: 'miao 服务', method: 'GET',
       target: 'http://miao.bilibili-wrbq.cn',
       statusPageLink: 'http://miao.bilibili-wrbq.cn',
       tooltip: 'miao.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 6/9 ────────────────────────────────────────────────
+    // ── 6/8 ────────────────────────────────────────────────
     { id: 'wrbqos_cn', name: 'WRBQ OS', method: 'GET',
       target: 'http://wrbqos.bilibili-wrbq.cn',
       statusPageLink: 'http://wrbqos.bilibili-wrbq.cn',
       tooltip: 'wrbqos.bilibili-wrbq.cn',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 7/9 ────────────────────────────────────────────────
+    // ── 7/8 ────────────────────────────────────────────────
     { id: 'www_top', name: '主站（top 域名）', method: 'GET',
       target: 'http://www.bilibili-wrbq.top',
       statusPageLink: 'http://www.bilibili-wrbq.top',
       tooltip: 'www.bilibili-wrbq.top',
       expectedCodes: [200, 301, 302], timeout: 10000 },
 
-    // ── 8/9 ────────────────────────────────────────────────
+    // ── 8/8 ────────────────────────────────────────────────
     // NewAPI 网关：监控 /api/status 健康接口，并校验返回内容里的 "success":true
     // 注意：不要监控根路径 —— NewAPI 的根路径是前端静态页，
     // 后端服务或数据库挂了它照样返回 200，测不出真实故障。
@@ -91,31 +89,6 @@ const workerConfig: WorkerConfig = {
       expectedCodes: [200],
       responseKeyword: '"success":true',
       timeout: 15000 },
-
-    // ── 9/9 ────────────────────────────────────────────────
-    // Minecraft 服务器（Java 版），监控方式：TCP 端口探测
-    //
-    // 【为什么这里不写 mc.bilibili-wrbq.cn】
-    // 你用的是 SRV 记录：
-    //     _minecraft._tcp.mc.bilibili-wrbq.cn  →  frp-sun.com : 21433
-    // 玩家在游戏里填 mc.bilibili-wrbq.cn 能连上，是因为客户端会自动查 SRV。
-    // 但 UptimeFlare 的检测**不解析 SRV**，它只会直接连你写的那个地址。
-    // 而 mc.bilibili-wrbq.cn 本身没有 A 记录（没有真实 IP），
-    // 所以这里必须填 SRV 指向的真实地址：frp-sun.com:21433
-    // ⚠️ 千万别改成 mc.bilibili-wrbq.cn:25565，那样会一直报宕机。
-    // 【暂时停用 —— 等找到可用方案再启用】
-    // 现状：你的 MC 服务器本身完全正常（实测能拿到 1.21.11 / 创造服 / 0-20 人在线），
-    //      但 frp 服务商（frp-sun.com）屏蔽了海外机房 IP，
-    //      而 Cloudflare Workers 用的正是机房 IP，所以从 Cloudflare 连不上 21433 端口。
-    //      实测：台北住宅宽带能通；东京、首尔、洛杉矶、伦敦、阿姆斯特丹、香港的机房全部 100% 丢包。
-    // 启用条件（满足其一即可，启用时把下面这块的 // 去掉，并把上面分组的注释一起去掉）：
-    //   ① 换一个不屏蔽海外机房的 frp 服务商 / 节点；
-    //   ② 在 MC 服务器上跑一个 HTTP 状态页，用 Cloudflare Tunnel 暴露后改用 GET 方式监控。
-    // ⚠️ 注意：target 必须填 SRV 指向的真实地址，不能写 mc.bilibili-wrbq.cn（它没有 A 记录）。
-    // { id: 'mc_server', name: 'Minecraft 服务器', method: 'TCP_PING',
-    //   target: 'frp-sun.com:21433',
-    //   tooltip: 'mc.bilibili-wrbq.cn（SRV 转发至 frp-sun.com:21433）',
-    //   timeout: 10000 },
 
     // ↓↓↓ 下面是注释掉的写法示例，不生效，留着方便你以后照着加 ↓↓↓
 
